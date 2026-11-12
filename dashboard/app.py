@@ -164,7 +164,6 @@ else:
         st.subheader("📥 Exportação Automática de Relatórios de Auditoria")
         st.markdown("Baixe o pacote completo com os logs de decisão de todos os agentes para análise externa.")
         
-        # Cria um arquivo CSV temporário para download direto no Streamlit
         df_para_exportar = df.head(100).to_pandas()
         csv_bytes = df_para_exportar.to_csv(index=False).encode('utf-8')
         
