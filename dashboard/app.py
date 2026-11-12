@@ -4,9 +4,8 @@ import pandas as pd
 import os
 from pathlib import Path
 
-# Configuração da Página
 st.set_page_config(
-    page_title="DOUBLE AI EVOLUTION — Análise Avançada de Agentes",
+    page_title="DOUBLE AI EVOLUTION — Sala de Comando",
     page_icon="🤖",
     layout="wide"
 )
@@ -26,32 +25,28 @@ def carregar_dados():
             return pl.read_parquet(str(p))
     return None
 
-st.title("🤖 DOUBLE AI EVOLUTION — Motor Analítico & Comportamento dos Agentes")
+st.title("🤖 DOUBLE AI EVOLUTION — Sala de Comando & Auditoria")
 st.markdown("---")
 
 df = carregar_dados()
 
 if df is None:
-    st.error("⚠️ Banco Parquet não encontrado. Verifique o caminho dos dados.")
+    st.error("⚠️ Banco Parquet não encontrado.")
 else:
-    # Identifica a coluna de cores de forma inteligente
-    colunas_possiveis = ["cor", "color", "resultado", "type", "colour"]
-    col_cor = next((c for c in colunas_possiveis if c in df.columns), None)
-    
-    # Sidebar de Configuração Tática
+    # Sidebar de Controle
     st.sidebar.header("⚙️ Parâmetros dos Agentes")
     banca = st.sidebar.number_input("Banca Atual (R$)", value=1000.0, step=100.0)
-    limiar_streak = st.sidebar.slider("Limiar de Exaustão (Streak para Entrada)", 3, 8, 4)
+    limiar_streak = st.sidebar.slider("Limiar de Exaustão (Streak)", 3, 8, 4)
     risco_por_entrada = st.sidebar.slider("Exposição por Entrada (%)", 1.0, 5.0, 2.0)
-    
-    # Métricas Globais Extraídas do Banco Real
+
     total_rodadas = len(df)
     
+    # Métricas Superiores
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("Total Analisado", f"{total_rodadas:,}".replace(",", "."))
     with col2:
-        st.metric("Estratégia Ativa", "Filtro de Exaustão")
+        st.metric("Banca Operacional", f"R$ {banca:,.2f}")
     with col3:
         st.metric("Estado do Agente", "⏳ Aguardando Gatilho")
     with col4:
@@ -59,40 +54,32 @@ else:
 
     st.markdown("---")
     
-    tab1, tab2, tab3 = st.tabs(["📊 Gráficos & Distribuição Real", "🎯 O que os Agentes Estão Esperando", "📋 Auditoria de Padrões"])
+    # Abas organizadas
+    tab1, tab2, tab3 = st.tabs(["📊 Inspeção & Colunas do Banco", "🎯 Comportamento dos Agentes", "📋 Prévia de Registros"])
     
     with tab1:
-        st.subheader("📊 Distribuição Estatística Real (Base: 1.58M Rodadas)")
-        if col_cor:
-            # Gráfico de barras com dados reais do Polars
-            contagem_df = df.group_by(col_cor).len().sort("len", descending=True).to_pandas()
-            st.bar_chart(contagem_df.set_index(col_cor))
-            
-            st.markdown("### 📈 Proporção de Saídas")
-            st.dataframe(contagem_df, use_container_width=True)
-        else:
-            st.warning("Coluna de cores/resultados não identificada no banco Parquet.")
-            
-    with tab2:
-        st.subheader("🎯 Estado Operacional & Critérios de Espera dos Agentes")
-        st.info("Aqui é exibido exatamente o comportamento de espera: o Agente Sentinela analisa a volatilidade e **apenas joga** quando o mercado atinge o limite de exaustão configurado.")
+        st.subheader("🔍 Diagnóstico das Colunas do seu Banco Parquet")
+        st.info("Aqui listamos todas as colunas reais presentes no seu arquivo para sabermos exatamente onde estão as cores, números e horários.")
         
-        # Análise baseada nas últimas rodadas do banco real
-        if col_cor and total_rodadas > 20:
-            ultimas_10 = df.tail(10).to_pandas()
-            st.markdown("**Últimas 10 Rodadas Registradas no Motor:**")
-            st.dataframe(ultimas_10, use_container_width=True)
-            
-            st.markdown(f"""
-            * **Regra de Decisão Atual:** O agente está aguardando uma sequência de **{limiar_streak}+** repetições da mesma cor para acionar a entrada contrária (Estratégia de Ruptura de Ciclo).
-            * **Gestão de Capital:** Com base na sua banca de **R$ {banca:,.2f}**, o valor de cada entrada validada será de **R$ {banca * (risco_por_entrada / 100.0):,.2f}**.
-            """)
-        else:
-            st.warning("Dados insuficientes para análise em tempo real.")
-            
-    with tab3:
-        st.subheader("📋 Relatório de Padrões e Ciclos Históricos")
-        st.markdown("""
-        * **Filtros de Ruído Ativos:** O Agente Validador descarta padrões de alta volatilidade onde a variância excede o limite tolerado.
-        * **Sincronização com o Render:** O motor `robo-blitz` continua enviando os dados brutos para que esta base Parquet seja atualizada incrementalmente.
+        # Exibe as colunas e os tipos de dados
+        colunas_info = pd.DataFrame({
+            "Coluna": df.columns,
+            "Tipo": [str(t) for t in df.dtypes]
+        })
+        st.table(colunas_info)
+        
+        # Exibe uma amostra real do banco
+        st.markdown("### 📋 Amostra Bruta do Banco")
+        st.dataframe(df.head(20).to_pandas(), use_container_width=True)
+        
+    with tab2:
+        st.subheader("🎯 Critérios de Espera & Execução dos Agentes")
+        st.markdown(f"""
+        * **Estratégia Ativa:** Filtro de Ruptura por Exaustão de Streak.
+        * **Condição de Entrada:** O Agente Sentinela permanece em **estado de espera** até que o padrão histórico atinja um streak de **{limiar_streak}** repetições consecutivas.
+        * **Gestão de Risco:** Com a banca de **R$ {banca:,.2f}** e exposição de **{risco_por_entrada}%**, o valor estipulado por jogada validada é de **R$ {banca * (risco_por_entrada / 100.0):,.2f}**.
         """)
+        
+    with tab3:
+        st.subheader("📋 Últimas Rodadas Capturadas")
+        st.dataframe(df.tail(15).to_pandas(), use_container_width=True)
