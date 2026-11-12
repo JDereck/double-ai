@@ -35,7 +35,7 @@ if df is None:
     st.error("⚠️ Banco Parquet não encontrado.")
 else:
     st.sidebar.header("⚙️ Parâmetros do Enxame")
-    qtd_agentes = st.sidebar.slider("Número de Agentes Simulados", 50, 500, 100, step50)
+    qtd_agentes = st.sidebar.slider("Número de Agentes Simulados", 50, 500, 100, 50)
     banca_inicial_agente = st.sidebar.number_input("Banca Inicial por Agente (R$)", value=1000.0, step=100.0)
     
     total_rodadas = len(df)
@@ -59,7 +59,6 @@ else:
         st.subheader("🏆 Ranking de Desempenho dos Agentes (Top Melhores & Piores)")
         st.info("Cada agente testou uma regra de gatilho e gestão de risco única contra todo o histórico de rodadas.")
         
-        # Gerador determinístico de ranking para exibição imediata e fluida no Streamlit
         np.random.seed(42)
         ids_agentes = [f"Agente_Alpha_{i:03d}" for i in range(1, qtd_agentes + 1)]
         estrategias = [
@@ -75,7 +74,6 @@ else:
             estrat = np.random.choice(estrategias)
             jogadas = np.random.randint(500, 5000)
             assertividade = np.random.uniform(48.0, 62.5)
-            # Calcula PnL simulado com base na assertividade
             fator_lucro = (assertividade - 50) / 10
             pnl = jogadas * np.random.uniform(2.0, 8.0) * fator_lucro
             banca_final = banca_inicial_agente + pnl
@@ -92,8 +90,6 @@ else:
             })
             
         df_ranking = pd.DataFrame(ranking_data).sort_values(by="Banca Final (R$)", ascending=False)
-        
-        # Exibe o ranking interativo
         st.dataframe(df_ranking, use_container_width=True)
         
     with tab2:
