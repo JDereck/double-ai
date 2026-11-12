@@ -181,23 +181,17 @@ else:
         col_a, col_b, col_c = st.columns(3)
         with col_a:
             st.markdown("### Capitão Alpha")
-            st.info("Estratégia: Exaustão (Gatilho 4)
-
-**Status:** ⏳ Em espera (aguardando streak).")
+            st.info("Estratégia: Exaustão (Gatilho 4)")
             st.metric("Banca Virtual", f"R$ {banca_agente + 340:,.2f}", "+ R$ 340,00")
         with col_b:
             st.markdown("### Capitão Beta")
-            st.success("Estratégia: Ruptura (Gatilho 5)
-
-**Status:** 🟢 Gatilho armado / Operando.")
+            st.success("Estratégia: Ruptura (Gatilho 5)")
             st.metric("Banca Virtual", f"R$ {banca_agente + 580:,.2f}", "+ R$ 580,00")
         with col_c:
             st.markdown("### Capitão Gamma")
-            st.info("Estratégia: Tendência Cruzada
-
-**Status:** ⏳ Avaliando micro-ciclos.")
+            st.info("Estratégia: Tendência Cruzada")
             st.metric("Banca Virtual", f"R$ {banca_agente + 120:,.2f}", "+ R$ 120,00")
-
+            
     with tab3:
         st.subheader("📊 Amostra do Banco Parquet Auditado")
         st.dataframe(df.head(50).to_pandas(), use_container_width=True)
