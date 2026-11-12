@@ -6,7 +6,8 @@ from pathlib import Path
 st.set_page_config(page_title="DOUBLE AI EVOLUTION", page_icon="🤖", layout="wide")
 
 BASE_DIR = Path("/content/drive/MyDrive/DOUBLE_AI_EVOLUTION")
-PARQUET_PATH = BASE_DIR / "data/processed/double_history_auditado.parquet"
+caminhos_possiveis = ["double_history_auditado.parquet", "data/processed/double_history_auditado.parquet", BASE_DIR / "data/processed/double_history_auditado.parquet"]
+    parquet_encontrado = next((p for p in caminhos_possiveis if os.path.exists(str(p))), None)
 
 st.title("🤖 DOUBLE AI EVOLUTION — Laboratório de IA & Auditoria")
 st.markdown("---")
