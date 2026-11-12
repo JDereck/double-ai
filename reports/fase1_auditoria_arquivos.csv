@@ -1,0 +1,46 @@
+pasta,arquivo,status,linhas_brutas,linhas_validas,tem_numero,divergencias_cor
+historico-2025,Cópia de historico_01_2025.csv,OK_COMPLETO,28184,28184,True,0
+historico-2025,Cópia de historico_01_2026.csv,OK_COMPLETO,86740,86740,True,0
+historico-2025,Cópia de historico_02_2025.csv,OK_COMPLETO,42131,42131,True,0
+historico-2025,Cópia de historico_02_2026.csv,OK_COMPLETO,76928,76928,True,0
+historico-2025,Cópia de historico_03_2025.csv,OK_COMPLETO,72727,72727,True,0
+historico-2025,Cópia de historico_03_2026.csv,OK_COMPLETO,84746,84746,True,0
+historico-2025,Cópia de historico_04_2025.csv,OK_COMPLETO,71390,71390,True,0
+historico-2025,Cópia de historico_04_2026.csv,OK_COMPLETO,83325,83325,True,0
+historico-2025,Cópia de historico_05_2025.csv,OK_COMPLETO,74473,74473,True,0
+historico-2025,Cópia de historico_05_2026.csv,OK_COMPLETO,86963,86963,True,0
+historico-2025,Cópia de historico_06_2025.csv,OK_COMPLETO,72172,72172,True,0
+historico-2025,Cópia de historico_06_2026.csv,OK_COMPLETO,84259,84259,True,0
+historico-2025,Cópia de historico_07_2025.csv,OK_COMPLETO,77673,77673,True,0
+historico-2025,Cópia de historico_07_2026.csv,OK_COMPLETO,85798,85798,True,0
+historico-2025,Cópia de historico_08_2025.csv,OK_COMPLETO,81227,81227,True,0
+historico-2025,Cópia de historico_08_2026.csv,OK_COMPLETO,87025,87025,True,0
+historico-2025,Cópia de historico_09_2025.csv,OK_COMPLETO,71661,71661,True,0
+historico-2025,Cópia de historico_10_2025.csv,OK_COMPLETO,82608,82608,True,0
+historico-2025,Cópia de historico_10_2026.csv,OK_COMPLETO,71907,71907,True,0
+historico-2025,Cópia de historico_11_2025.csv,OK_COMPLETO,81629,81629,True,0
+historico-2025,Cópia de historico_12_2025.csv,OK_COMPLETO,85529,85529,True,0
+historico2022,tipminer_double_2022-02_2022-02-01_a_2022-02-28_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",73811,0,False,0
+historico2022,tipminer_double_2022-03_2022-03-01_a_2022-03-31_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",82230,0,False,0
+historico2022,tipminer_double_2022-04_2022-04-01_a_2022-04-30_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",85094,0,False,0
+historico2022,tipminer_double_2022-05_2022-05-01_a_2022-05-31_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",88881,0,False,0
+historico2022,tipminer_double_2022-06_2022-06-01_a_2022-06-30_backup (1).csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",84124,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2025-01-01_a_2026-08-31.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",115446,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2025-03_2025-03-01_a_2025-03-31_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",39680,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2025-04_2025-04-01_a_2025-04-30_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",36837,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2025-05_2025-05-01_a_2025-05-31_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",34403,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2025-06_2025-06-01_a_2025-06-30_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",46775,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2025-07_2025-07-01_a_2025-07-31_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",61772,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2025-08_2025-08-01_a_2025-08-31_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",53324,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2025-09_2025-09-01_a_2025-09-30_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",55173,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2025-10_2025-10-01_a_2025-10-31_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",61935,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2025-11_2025-11-01_a_2025-11-30_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",59882,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2025-12_2025-12-01_a_2025-12-31_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",60813,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2026-01_2026-01-01_a_2026-01-31_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",61552,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2026-02_2026-02-01_a_2026-02-28_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",54994,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2026-03_2026-03-01_a_2026-03-31_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",60788,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2026-04_2026-04-01_a_2026-04-30_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",58855,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2026-05_2026-05-01_a_2026-05-31_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",57244,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2026-06_2026-06-01_a_2026-06-30_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",59530,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2026-07_2026-07-01_a_2026-07-31_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",60962,0,False,0
+historicoroleta1,tipminer_evolution_roulette_2026-08_2026-08-01_a_2026-08-31_COMPLETO_backup.csv,"IGNORADO_COLUNAS: ['uuid', 'result', 'type', 'instant', 'local_date', 'local_time']",60196,0,False,0
