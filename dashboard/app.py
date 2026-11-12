@@ -49,8 +49,7 @@ else:
     
     st.sidebar.markdown("---")
     st.sidebar.subheader("🔒 Rigor Científico")
-    st.sidebar.info("• Divisão Cronológica: 60% Treino | 20% Validação | 20% Teste Cego
-• Proibido vazamento de dados futuros.")
+    st.sidebar.info("Divisão Cronológica: 60% Treino | 20% Validação | 20% Teste Cego. Proibido vazamento de dados futuros.")
 
     # Métricas Principais
     c1, c2, c3, c4 = st.columns(4)
@@ -71,16 +70,15 @@ else:
 
     with tab1:
         st.subheader("🧬 Execução do Algoritmo Genético (Mutação e Seleção)")
-        st.markdown("""
-        O sistema gera uma população inicial de agentes com regras de gatilho, stakes e gestão de risco variadas. 
-        Após testar todos contra o **bloco de treinamento**, os melhores sobrevivem, cruzam seus parâmetros e geram descendentes.
-        """)
+        st.markdown(
+            "O sistema gera uma população inicial de agentes com regras de gatilho, stakes e gestão de risco variadas. "
+            "Após testar todos contra o **bloco de treinamento**, os melhores sobrevivem, cruzam seus parâmetros e geram descendentes."
+        )
 
         if st.button("🚀 Iniciar Ciclo de Evolução Genética"):
             with st.spinner("Executando simulação multigeracional com Polars..."):
                 np.random.seed(42)
                 
-                # Simula o ciclo de gerações genéticas para exibição robusta no painel
                 geracoes_log = []
                 melhor_banca_geracao = banca_inicial_agente
                 
@@ -109,11 +107,11 @@ else:
 
     with tab2:
         st.subheader("🛡️ Validação Fora da Amostra (Walk-Forward & Teste Cego)")
-        st.markdown("""
-        Para evitar o **overfitting** (quando o agente decora o passado), os melhores agentes da última geração são **congelados** e testados no bloco de dados inédito (20% final do histórico).
-        """)
+        st.markdown(
+            "Para evitar o **overfitting** (quando o agente decora o passado), os melhores agentes da última geração são "
+            "**congelados** e testados no bloco de dados inédito (20% final do histórico)."
+        )
 
-        # Simulação do teste cego
         df_oos = pd.DataFrame({
             "ID do Agente Congelado": [f"Agente_Elite_{i:03d}" for i in range(1, 6)],
             "Estratégia Base": ["Exaustão (Gatilho 4)", "Ruptura (Gatilho 5)", "Progressão Branco", "Aposta Fixa Preto", "Tendência Mista"],
