@@ -37,7 +37,7 @@ class MotorBacktestEnxame:
         colunas = self.df.columns
         self.col_cor = next((c for c in ["color", "cor", "resultado", "type"] if c in colunas), None)
         if not self.col_cor:
-            self.col_cor = colunas[0] # Fallback para a primeira coluna se necessário
+            self.col_cor = colunas[0]
 
     def avaliar_agente(self, genome: dict, banca_inicial: float = 1000.0) -> dict:
         gatilho = genome["gatilho_streak"]
@@ -73,7 +73,6 @@ class MotorBacktestEnxame:
                 if banca < valor_aposta or valor_aposta <= 0:
                     break
                 
-                # Aposta contra o streak (Ruptura de Ciclo)
                 cor_esperada = "red" if str(cor_anterior).lower() in ["black", "preto", "8", "9", "10", "11", "12", "13", "14"] else "black"
                 
                 banca -= valor_aposta
@@ -112,15 +111,19 @@ class MotorBacktestEnxame:
         return sorted(resultados, key=lambda x: x["banca_final"], reverse=True)
 
 # Interface Principal Streamlit
-st.title("🤖 DOUBLE AI EVOLUTION — Laboratório Científico & Enxame")
+st.title("🤖 DOUBLE AI EVOLUTION — Laboratório Científico")
 st.markdown("---")
 
 df = carregar_dados()
 
 if df is None:
-    st.error("⚠️ Banco Parquet não encontrado. Verifique a existência do arquivo na raiz ou na pasta data/processed/.")
+    st.error("⚠️ Banco Parquet não encontrado. Verifique a existência do arquivo.")
 else:
     total_rodadas = len(df)
+    
+    colunas_df = df.columns
+    col_cor = next((c for c in ["color", "cor", "resultado", "type"] if c in colunas_df), None)
+    col_roll = next((c for c in ["roll", "numero", "number", "resultado_num"] if c in colunas_df), None)
     
     # Barra lateral de controle
     st.sidebar.header("⚙️ Configuração do Laboratório")
@@ -132,26 +135,25 @@ else:
     c1.metric("Base de Dados", f"{total_rodadas:,}".replace(",", "."))
     c2.metric("Motor Analítico", "Polars (Vetorial)")
     c3.metric("Banca por Agente", f"R$ {banca_agente:,.2f}")
-    c4.metric("Status do Sistema", "🟢 Pronto para Teste")
+    c4.metric("Status do Sistema", "🟢 Pronto")
     
     st.markdown("---")
     
-    # Abas do Painel
-    tab1, tab2, tab3 = st.tabs([
-        "🧬 Laboratório de Evolução Genética", 
-        "🛡️ Capitães & Comportamento", 
-        "📊 Inspeção do Banco Histórico"
+    # Abas do Painel (Adicionada a Aba de Estatísticas)
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "🧬 Evolução Genética", 
+        "📊 Estatísticas & Frequências", 
+        "🛡️ Capitães & Enxame", 
+        "📋 Dados Brutos"
     ])
     
     with tab1:
         st.subheader("🧬 Simulação Genética e Backtest em Massa sobre 1,5M de Rodadas")
-        st.markdown("O sistema instancia agentes com parâmetros genéticos de gatilho e risco, simulando todas as rodadas em paralelo sem vazamento de dados futuros.")
+        st.markdown("O sistema instancia agentes com parâmetros genéticos de gatilho e risco, simulando todas as rodadas em paralelo.")
         
-        if st.button("🚀 Iniciar Simulação Genética em Massa agora"):
-            with st.spinner("Executando backtest massivo com Polars sobre 1,5 milhão de registros..."):
+        if st.button("🚀 Iniciar Simulação Genética em Massa"):
+            with st.spinner("Executando backtest massivo com Polars..."):
                 motor = MotorBacktestEnxame(df)
-                
-                # Gera população inicial
                 populacao_inicial = [
                     {
                         "id": f"Agente_Gen_{i:03d}",
@@ -160,24 +162,45 @@ else:
                     }
                     for i in range(qtd_agentes_sim)
                 ]
-                
-                # Executa avaliação completa
                 ranking_resultado = motor.executar_geracao(populacao_inicial)
                 df_ranking = pd.DataFrame(ranking_resultado)
                 
-                st.success("✅ Simulação concluída com sucesso sobre todo o histórico!")
-                st.markdown("### 🏆 Ranking de Desempenho dos Agentes")
+                st.success("✅ Simulação concluída com sucesso!")
                 st.dataframe(df_ranking, use_container_width=True)
-                
-                st.markdown("### 📊 Gráfico de Bancas Finais (Top 10)")
                 st.bar_chart(df_ranking.head(10).set_index("id")["banca_final"])
         else:
-            st.info("👆 Clique no botão acima para rodar o motor genético e calcular o desempenho de todos os agentes contra o banco histórico.")
+            st.info("👆 Clique no botão acima para rodar o motor genético contra o banco histórico.")
 
     with tab2:
-        st.subheader("🛡️ Sala de Comando dos Capitães (Alpha, Beta, Gamma)")
-        st.markdown("Acompanhe o estado de espera e execução dos capitães principais conectados à API ao vivo.")
+        st.subheader("📊 Análise Estatística Avançada (Frequências, Distribuição e Atrasos)")
+        st.markdown("Relatório analítico computado instantaneamente sobre todo o banco de dados histórico.")
         
+        if col_cor:
+            freq_cores = (
+                df.group_by(col_cor)
+                .len()
+                .with_columns((pl.col("len") / total_rodadas * 100).alias("percentual"))
+                .sort("len", descending=True)
+                .to_pandas()
+            )
+            st.markdown("### 🎨 Frequência de Cores / Resultados")
+            st.dataframe(freq_cores, use_container_width=True)
+            st.bar_chart(freq_cores.set_index(col_cor)["len"])
+            
+        if col_roll:
+            freq_num = (
+                df.group_by(col_roll)
+                .len()
+                .with_columns((pl.col("len") / total_rodadas * 100).alias("percentual"))
+                .sort(col_roll)
+                .to_pandas()
+            )
+            st.markdown("### 🔢 Distribuição dos Números (0 a 14)")
+            st.dataframe(freq_num, use_container_width=True)
+            st.bar_chart(freq_num.set_index(col_roll)["len"])
+
+    with tab3:
+        st.subheader("🛡️ Sala de Comando dos Capitães")
         col_a, col_b, col_c = st.columns(3)
         with col_a:
             st.markdown("### Capitão Alpha")
@@ -191,7 +214,7 @@ else:
             st.markdown("### Capitão Gamma")
             st.info("Estratégia: Tendência Cruzada")
             st.metric("Banca Virtual", f"R$ {banca_agente + 120:,.2f}", "+ R$ 120,00")
-            
-    with tab3:
-        st.subheader("📊 Amostra do Banco Parquet Auditado")
+
+    with tab4:
+        st.subheader("📋 Amostra do Banco Parquet Auditado")
         st.dataframe(df.head(50).to_pandas(), use_container_width=True)
