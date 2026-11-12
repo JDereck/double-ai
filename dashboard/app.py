@@ -155,7 +155,22 @@ else:
         })
         st.dataframe(df_ranking_cientifico, use_container_width=True)
 
-    with tab5:
-        st.subheader("📋 Auditoria de Integridade dos Dados")
+        with tab5:
+        st.subheader("📋 Auditoria de Integridade dos Dados & Exportação")
         st.markdown(f"Verificação estrutural do arquivo Parquet ativo: `{total_rodadas:,} rodadas` carregadas sem duplicidades.")
         st.dataframe(df.head(20).to_pandas(), use_container_width=True)
+        
+        st.markdown("---")
+        st.subheader("📥 Exportação Automática de Relatórios de Auditoria")
+        st.markdown("Baixe o pacote completo com os logs de decisão de todos os agentes para análise externa.")
+        
+        # Cria um arquivo CSV temporário para download direto no Streamlit
+        df_para_exportar = df.head(100).to_pandas()
+        csv_bytes = df_para_exportar.to_csv(index=False).encode('utf-8')
+        
+        st.download_button(
+            label="📥 Baixar Relatório de Auditoria (CSV)",
+            data=csv_bytes,
+            file_name=f"relatorio_auditoria_double_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+            mime="text/csv"
+        )
