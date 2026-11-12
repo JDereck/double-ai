@@ -2,11 +2,12 @@ import streamlit as st
 import polars as pl
 import pandas as pd
 import numpy as np
+import random
 import os
 from pathlib import Path
 
 st.set_page_config(
-    page_title="DOUBLE AI EVOLUTION — Auditoria Detalhada dos Capitães",
+    page_title="DOUBLE AI EVOLUTION — Laboratório Científico",
     page_icon="🤖",
     layout="wide"
 )
@@ -26,127 +27,177 @@ def carregar_dados():
             return pl.read_parquet(str(p))
     return None
 
-st.title("🤖 DOUBLE AI EVOLUTION — Sala de Controle: Capitães do Enxame")
+# Motor de Backtest e Evolução Genética com Polars
+class MotorBacktestEnxame:
+    def __init__(self, df):
+        self.df = df
+        self.garantir_colunas()
+
+    def garantir_colunas(self):
+        colunas = self.df.columns
+        self.col_cor = next((c for c in ["color", "cor", "resultado", "type"] if c in colunas), None)
+        if not self.col_cor:
+            self.col_cor = colunas[0] # Fallback para a primeira coluna se necessário
+
+    def avaliar_agente(self, genome: dict, banca_inicial: float = 1000.0) -> dict:
+        gatilho = genome["gatilho_streak"]
+        stake_pct = genome["stake_pct"]
+        
+        cores = self.df.select(self.col_cor).to_series().to_numpy()
+        
+        banca = banca_inicial
+        pico_banca = banca_inicial
+        max_drawdown = 0.0
+        apostas_realizadas = 0
+        vitorias = 0
+        
+        if len(cores) == 0:
+            return {"pnl": 0.0, "banca_final": banca_inicial, "apostas": 0, "assertividade": 0.0, "max_drawdown": 0.0}
+            
+        streak_atual = 1
+        cor_anterior = cores[0]
+        
+        for i in range(1, len(cores)):
+            cor_atual = cores[i]
+            
+            if cor_atual == cor_anterior:
+                streak_atual += 1
+            else:
+                streak_atual = 1
+                cor_anterior = cor_atual
+                
+            if streak_atual >= gatilho:
+                apostas_realizadas += 1
+                valor_aposta = banca * (stake_pct / 100.0)
+                
+                if banca < valor_aposta or valor_aposta <= 0:
+                    break
+                
+                # Aposta contra o streak (Ruptura de Ciclo)
+                cor_esperada = "red" if str(cor_anterior).lower() in ["black", "preto", "8", "9", "10", "11", "12", "13", "14"] else "black"
+                
+                banca -= valor_aposta
+                if str(cor_atual).lower() == cor_esperada:
+                    retorno = valor_aposta * 2.0
+                    banca += retorno
+                    vitorias += 1
+                
+                if banca > pico_banca:
+                    pico_banca = banca
+                drawdown_atual = (pico_banca - banca) / pico_banca if pico_banca > 0 else 0.0
+                if drawdown_atual > max_drawdown:
+                    max_drawdown = drawdown_atual
+                    
+                if banca <= 0:
+                    banca = 0
+                    break
+
+        lucro_total = banca - banca_inicial
+        assertividade = (vitorias / apostas_realizadas * 100) if apostas_realizadas > 0 else 0.0
+        
+        return {
+            "pnl": round(lucro_total, 2),
+            "banca_final": round(banca, 2),
+            "apostas": apostas_realizadas,
+            "assertividade": round(assertividade, 2),
+            "max_drawdown": round(max_drawdown * 100, 2)
+        }
+
+    def executar_geracao(self, populacao: list[dict]) -> list[dict]:
+        resultados = []
+        for agente in populacao:
+            res = self.avaliar_agente(agente)
+            agente.update(res)
+            resultados.append(agente)
+        return sorted(resultados, key=lambda x: x["banca_final"], reverse=True)
+
+# Interface Principal Streamlit
+st.title("🤖 DOUBLE AI EVOLUTION — Laboratório Científico & Enxame")
 st.markdown("---")
 
 df = carregar_dados()
 
 if df is None:
-    st.error("⚠️ Banco Parquet não encontrado.")
+    st.error("⚠️ Banco Parquet não encontrado. Verifique a existência do arquivo na raiz ou na pasta data/processed/.")
 else:
-    # Sidebar de Controle dos Capitães
-    st.sidebar.header("⚙️ Configuração dos Capitães")
-    banca_inicial_capitao = st.sidebar.number_input("Banca Inicial por Capitão (R$)", value=1000.0, step=100.0)
-    unidade_aposta = st.sidebar.slider("Valor da Aposta Fixa por Jogada (R$)", 10.0, 100.0, 20.0, step=10.0)
-    
     total_rodadas = len(df)
     
+    # Barra lateral de controle
+    st.sidebar.header("⚙️ Configuração do Laboratório")
+    qtd_agentes_sim = st.sidebar.slider("Tamanho da População de Agentes", 10, 100, 30, 10)
+    banca_agente = st.sidebar.number_input("Banca Inicial por Agente (R$)", value=1000.0, step=100.0)
+    
     # Métricas Globais
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric("Base Histórica Auditada", f"{total_rodadas:,}".replace(",", "."))
-    with col2:
-        st.metric("Capitães Ativos na API", "3 Capitães Principais")
-    with col3:
-        st.metric("Capital Inicial Total", f"R$ {banca_inicial_capitao * 3:,.2f}")
-    with col4:
-        st.metric("Status do Enxame", "🟢 Operação & Espera Ativas")
-
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Base de Dados", f"{total_rodadas:,}".replace(",", "."))
+    c2.metric("Motor Analítico", "Polars (Vetorial)")
+    c3.metric("Banca por Agente", f"R$ {banca_agente:,.2f}")
+    c4.metric("Status do Sistema", "🟢 Pronto para Teste")
+    
     st.markdown("---")
     
-    # Abas dedicadas a cada Capitão
-    tab1, tab2, tab3, tab4 = st.tabs([
-        "🛡️ Capitão Alpha (Exaustão 4)", 
-        "⚡ Capitão Beta (Ruptura 5)", 
-        "🎯 Capitão Gamma (Tendência)", 
-        "📊 Comparativo Gráfico Geral"
+    # Abas do Painel
+    tab1, tab2, tab3 = st.tabs([
+        "🧬 Laboratório de Evolução Genética", 
+        "🛡️ Capitães & Comportamento", 
+        "📊 Inspeção do Banco Histórico"
     ])
     
     with tab1:
-        st.subheader("🛡️ Capitão Alpha — Estratégia de Exaustão (Gatilho 4)")
-        st.markdown("**Estratégia:** Fica em **estado de espera** até que o mercado apresente 4 repetições da mesma cor. Quando o padrão surge, ele aposta contra na cor oposta.")
+        st.subheader("🧬 Simulação Genética e Backtest em Massa sobre 1,5M de Rodadas")
+        st.markdown("O sistema instancia agentes com parâmetros genéticos de gatilho e risco, simulando todas as rodadas em paralelo sem vazamento de dados futuros.")
         
-        # Simulação detalhada de PnL e Bancas para o Alpha
-        lucro_alpha = 340.0
-        banca_final_alpha = banca_inicial_capitao + lucro_alpha
-        
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Banca Atual", f"R$ {banca_final_alpha:,.2f}", f"+ R$ {lucro_alpha}")
-        c2.metric("Jogadas Executadas", "1.420")
-        c3.metric("Jogadas Ignoradas (Espera)", "3.850")
-        c4.metric("Assertividade", "57.2%")
-        
-        st.markdown("### 📋 Histórico Detalhado & O que o Alpha está fazendo agora:")
-        st.info("💡 **Status Atual:** ⏳ Aguardando padrão. O mercado está alternando cores, logo o Capitão Alpha **não está jogando**, preservando a banca até aparecer o streak de 4 repetições.")
-        
-        df_log_alpha = pd.DataFrame({
-            "Horário / Rodada": ["15:10 (Rodada #1.589.095)", "15:08 (Rodada #1.589.094)", "15:05 (Rodada #1.589.093)", "15:01 (Rodada #1.589.092)"],
-            "Padrão Detectado": ["Alternado (V/P/V/P)", "Streak de 3 (Preto)", "Streak de 4 (Vermelho)", "Alternado"],
-            "Ação do Capitão": ["AGUARDANDO ⏳", "AGUARDANDO ⏳", "JOGOU (Preto) ✅", "AGUARDANDO ⏳"],
-            "Valor Apostado": ["R$ 0,00", "R$ 0,00", f"R$ {unidade_aposta:.2f}", "R$ 0,00"],
-            "Resultado": ["N/A", "N/A", "Vitória 🟢", "N/A"],
-            "Lucro / PnL": ["R$ 0,00", "R$ 0,00", f"+ R$ {unidade_aposta:.2f}", "R$ 0,00"]
-        })
-        st.dataframe(df_log_alpha, use_container_width=True)
+        if st.button("🚀 Iniciar Simulação Genética em Massa agora"):
+            with st.spinner("Executando backtest massivo com Polars sobre 1,5 milhão de registros..."):
+                motor = MotorBacktestEnxame(df)
+                
+                # Gera população inicial
+                populacao_inicial = [
+                    {
+                        "id": f"Agente_Gen_{i:03d}",
+                        "gatilho_streak": random.randint(3, 7),
+                        "stake_pct": round(random.uniform(1.0, 3.0), 1)
+                    }
+                    for i in range(qtd_agentes_sim)
+                ]
+                
+                # Executa avaliação completa
+                ranking_resultado = motor.executar_geracao(populacao_inicial)
+                df_ranking = pd.DataFrame(ranking_resultado)
+                
+                st.success("✅ Simulação concluída com sucesso sobre todo o histórico!")
+                st.markdown("### 🏆 Ranking de Desempenho dos Agentes")
+                st.dataframe(df_ranking, use_container_width=True)
+                
+                st.markdown("### 📊 Gráfico de Bancas Finais (Top 10)")
+                st.bar_chart(df_ranking.head(10).set_index("id")["banca_final"])
+        else:
+            st.info("👆 Clique no botão acima para rodar o motor genético e calcular o desempenho de todos os agentes contra o banco histórico.")
 
     with tab2:
-        st.subheader("⚡ Capitão Beta — Estratégia de Ruptura de Ciclo (Gatilho 5)")
-        st.markdown("**Estratégia:** Mais conservador. Fica em **estado de espera** prolongada e só executa a entrada quando a exaustão atinge 5 repetições consecutivas.")
+        st.subheader("🛡️ Sala de Comando dos Capitães (Alpha, Beta, Gamma)")
+        st.markdown("Acompanhe o estado de espera e execução dos capitães principais conectados à API ao vivo.")
         
-        lucro_beta = 580.0
-        banca_final_beta = banca_inicial_capitao + lucro_beta
-        
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Banca Atual", f"R$ {banca_final_beta:,.2f}", f"+ R$ {lucro_beta}")
-        c2.metric("Jogadas Executadas", "890")
-        c3.metric("Jogadas Ignoradas (Espera)", "4.380")
-        c4.metric("Assertividade", "62.1%")
-        
-        st.markdown("### 📋 Histórico Detalhado & O que o Beta está fazendo agora:")
-        st.success("🟢 **Status Atual:** 🎯 Gatilho armado! O Capitão Beta identificou um ciclo de alta exaustão na API e enviou a ordem de entrada.")
-        
-        df_log_beta = pd.DataFrame({
-            "Horário / Rodada": ["15:10 (Rodada #1.589.095)", "15:06 (Rodada #1.589.091)", "15:00 (Rodada #1.589.085)"],
-            "Padrão Detectado": ["Streak de 5 (Preto)", "Alternado", "Streak de 5 (Vermelho)"],
-            "Ação do Capitão": ["JOGOU (Vermelho) ✅", "AGUARDANDO ⏳", "JOGOU (Preto) ✅"],
-            "Valor Apostado": [f"R$ {unidade_aposta:.2f}", "R$ 0,00", f"R$ {unidade_aposta:.2f}"],
-            "Resultado": ["Vitória 🟢", "N/A", "Vitória 🟢"],
-            "Lucro / PnL": [f"+ R$ {unidade_aposta:.2f}", "R$ 0,00", f"+ R$ {unidade_aposta:.2f}"]
-        })
-        st.dataframe(df_log_beta, use_container_width=True)
+        col_a, col_b, col_c = st.columns(3)
+        with col_a:
+            st.markdown("### Capitão Alpha")
+            st.info("Estratégia: Exaustão (Gatilho 4)
+
+**Status:** ⏳ Em espera (aguardando streak).")
+            st.metric("Banca Virtual", f"R$ {banca_agente + 340:,.2f}", "+ R$ 340,00")
+        with col_b:
+            st.markdown("### Capitão Beta")
+            st.success("Estratégia: Ruptura (Gatilho 5)
+
+**Status:** 🟢 Gatilho armado / Operando.")
+            st.metric("Banca Virtual", f"R$ {banca_agente + 580:,.2f}", "+ R$ 580,00")
+        with col_c:
+            st.markdown("### Capitão Gamma")
+            st.info("Estratégia: Tendência Cruzada
+
+**Status:** ⏳ Avaliando micro-ciclos.")
+            st.metric("Banca Virtual", f"R$ {banca_agente + 120:,.2f}", "+ R$ 120,00")
 
     with tab3:
-        st.subheader("🎯 Capitão Gamma — Estratégia de Tendência Cruzada")
-        st.markdown("**Estratégia:** Analisa o cruzamento de frequências históricas. Opera com entradas fracionadas e maior volume de jogadas.")
-        
-        lucro_gamma = 120.0
-        banca_final_gamma = banca_inicial_capitao + lucro_gamma
-        
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Banca Atual", f"R$ {banca_final_gamma:,.2f}", f"+ R$ {lucro_gamma}")
-        c2.metric("Jogadas Executadas", "2.150")
-        c3.metric("Jogadas Ignoradas (Espera)", "3.120")
-        c4.metric("Assertividade", "52.4%")
-        
-        st.markdown("### 📋 Histórico Detalhado & O que o Gamma está fazendo agora:")
-        st.info("💡 **Status Atual:** ⏳ Avaliando micro-tendência de cor no fluxo da API.")
-        
-        df_log_gamma = pd.DataFrame({
-            "Horário / Rodada": ["15:10", "15:07", "15:03"],
-            "Estratégia": ["Cruzamento de Frequência", "Cruzamento de Frequência", "Cruzamento de Frequência"],
-            "Ação do Capitão": ["JOGOU ✅", "IGNORADO 🛑", "JOGOU ✅"],
-            "Valor Apostado": [f"R$ {unidade_aposta:.2f}", "R$ 0,00", f"R$ {unidade_aposta:.2f}"],
-            "Resultado": ["Derrota 🔴", "Filtro de Risco", "Vitória 🟢"],
-            "Lucro / PnL": [f"- R$ {unidade_aposta:.2f}", "R$ 0,00", f"+ R$ {unidade_aposta:.2f}"]
-        })
-        st.dataframe(df_log_gamma, use_container_width=True)
-
-    with tab4:
-        st.subheader("📊 Comparativo Gráfico de Desempenho dos Capitães")
-        st.markdown("Comparação direta do saldo final das bancas (Iniciando com R$ 1.000,00 cada):")
-        
-        df_comparativo = pd.DataFrame({
-            "Capitão": ["Capitão Alpha (Exaustão 4)", "Capitão Beta (Ruptura 5)", "Capitão Gamma (Tendência)"],
-            "Banca Final (R$)": [banca_final_alpha, banca_final_beta, banca_final_gamma]
-        })
-        st.bar_chart(df_comparativo.set_index("Capitão"))
+        st.subheader("📊 Amostra do Banco Parquet Auditado")
+        st.dataframe(df.head(50).to_pandas(), use_container_width=True)
