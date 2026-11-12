@@ -83,8 +83,14 @@ else:
         
     with tab3:
         st.subheader("📈 Distribuição Histórica de Rodadas")
-        if "color" in df.columns:
-            contagem_cores = df.group_by("color").len().to_pandas()
-            st.bar_chart(contagem_cores.set_index("color"))
+        # Procura automaticamente qual coluna representa as cores ou resultados
+        colunas_possiveis = ["cor", "color", "resultado", "type", "colour"]
+        col_encontrada = next((c for c in colunas_possiveis if c in df.columns), None)
+        
+        if col_encontrada:
+            contagem = df.group_by(col_encontrada).len().to_pandas()
+            st.bar_chart(contagem.set_index(col_encontrada))
+            st.success(f"Gráfico gerado com base na coluna: **{col_encontrada}**")
         else:
-            st.warning("Coluna de cores não encontrada para o gráfico automático.")
+            st.info(f"Colunas disponíveis no banco: {list(df.columns)}")
+            st.warning("Nenhuma coluna padrão de cor foi identificada automaticamente.")
